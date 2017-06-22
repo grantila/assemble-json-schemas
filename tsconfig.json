@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"lib": [ "es2015", "es2017" ],
+		"moduleResolution": "node",
+		"outDir": "dist",
+		"pretty": true,
+		"target": "es5"
+	},
+	"types": [ "node" ],
+	"include": [
+		"index.ts",
+		"lib"
+	]
+}
