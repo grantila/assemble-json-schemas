@@ -1,6 +1,6 @@
 {
   "name": "assemble-json-schemas",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Assemble JSON Schemas into TypeScript and JavaScript",
   "author": "Gustaf Räntilä <g.rantila@gmail.com>",
   "license": "MIT",
@@ -12,8 +12,8 @@
   "pre-commit": [
     "build"
   ],
-  "bin" : {
-    "ajs" : "./cli"
+  "bin": {
+    "ajs": "./cli"
   },
   "dependencies": {
     "findit2": "2.x",
