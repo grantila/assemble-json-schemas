@@ -52,6 +52,9 @@ var compile_1 = require("./compile");
 var readFileAsync = promisify(fs_1.readFile);
 var writeFileAsync = promisify(fs_1.writeFile);
 var appendFileAsync = promisify(fs_1.appendFile);
+function camelCaseify(text) {
+    return text.replace(/(-.)/g, function (two) { return two.charAt(1).toUpperCase(); });
+}
 var defaultOptions = {
     interfaceNamer: defaultInterfaceNamer,
     findOptions: { followSymlinks: false },
@@ -62,14 +65,14 @@ function defaultInterfaceNamer(filename) {
 function compileSchemasToTypescript(files, options) {
     var jsttOpts = __assign({}, json_schema_to_typescript_1.DEFAULT_OPTIONS, { indentWith: "\t", bannerComment: "" });
     return Promise.all(files.map(function (file, index) {
-        return json_schema_to_typescript_1.compile(JSON.parse(file.content), options.interfaceNamer(file.path.name), jsttOpts);
+        return json_schema_to_typescript_1.compile(JSON.parse(file.content), options.interfaceNamer(camelCaseify(file.path.name)), jsttOpts);
     }))
         .then(function (definitions) { return definitions.join("\n"); });
 }
 function assembledSchemasAsTypescript(files, tsFile) {
     return writeFileAsync(tsFile, files
         .map(function (file) {
-        var name = file.path.name;
+        var name = camelCaseify(file.path.name);
         var schema = file.content;
         return "export const " + name + " = " + schema;
     })

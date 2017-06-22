@@ -13,6 +13,10 @@ const writeFileAsync = promisify( writeFile );
 const appendFileAsync = promisify( appendFile );
 
 
+function camelCaseify( text: string ): string
+{
+	return text.replace( /(-.)/g, two => two.charAt( 1 ).toUpperCase( ) );
+}
 
 export interface Options
 {
@@ -50,7 +54,7 @@ function compileSchemasToTypescript( files: File[], options: Options )
 		files.map( ( file, index ) =>
 			compile(
 				JSON.parse( file.content ),
-				options.interfaceNamer( file.path.name ),
+				options.interfaceNamer( camelCaseify( file.path.name ) ),
 				jsttOpts
 			)
 		)
@@ -66,7 +70,7 @@ function assembledSchemasAsTypescript( files: File[], tsFile: string )
 		files
 			.map( file =>
 			{
-				const name = file.path.name;
+				const name = camelCaseify( file.path.name );
 				const schema = file.content;
 
 				return `export const ${ name } = ${ schema }`
