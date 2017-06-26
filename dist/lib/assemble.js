@@ -69,14 +69,16 @@ function compileSchemasToTypescript(files, options) {
     }))
         .then(function (definitions) { return definitions.join("\n"); });
 }
-function assembledSchemasAsTypescript(files, tsFile) {
+function assembledSchemasAsTypescript(files, definitions, tsFile) {
     return writeFileAsync(tsFile, files
         .map(function (file) {
         var name = camelCaseify(file.path.name);
         var schema = file.content;
         return "export const " + name + " = " + schema;
     })
-        .join("\n"));
+        .join("\n")
+        + "\n"
+        + definitions);
 }
 function prependHeader(file) {
     return __awaiter(this, void 0, void 0, function () {
@@ -112,15 +114,13 @@ function assemble(schemaDir, outFile, options) {
         }));
     })
         .then(function (files) {
-        return Promise.all([
-            compileSchemasToTypescript(files, opts),
-            assembledSchemasAsTypescript(files, tsFile)
-        ]);
+        return compileSchemasToTypescript(files, opts)
+            .then(function (definitions) {
+            return assembledSchemasAsTypescript(files, definitions, tsFile);
+        });
     })
-        .then(function (_a) {
-        var interfaces = _a[0], _ = _a[1];
+        .then(function () {
         return compile_1.compile(tsFile)
-            .then(function () { return appendFileAsync(dtsFile, "\n" + interfaces); })
             .then(function () { return Promise.all([
             prependHeader(jsFile),
             prependHeader(tsFile),

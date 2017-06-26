@@ -62,8 +62,11 @@ function compileSchemasToTypescript( files: File[], options: Options )
 	.then( definitions => definitions.join( "\n" ) );
 }
 
-function assembledSchemasAsTypescript( files: File[], tsFile: string )
-: Promise< void >
+function assembledSchemasAsTypescript(
+	files: File[],
+	definitions: string,
+	tsFile: string
+): Promise< void >
 {
 	return writeFileAsync(
 		tsFile,
@@ -76,6 +79,8 @@ function assembledSchemasAsTypescript( files: File[], tsFile: string )
 				return `export const ${ name } = ${ schema }`
 			} )
 			.join( "\n" )
+			+ "\n"
+			+ definitions
 	);
 }
 
@@ -119,14 +124,13 @@ export function assemble(
 		)
 	)
 	.then( files =>
-		Promise.all( [
-			compileSchemasToTypescript( files, opts ),
-			assembledSchemasAsTypescript( files, tsFile )
-		] )
+		compileSchemasToTypescript( files, opts )
+		.then( definitions =>
+			assembledSchemasAsTypescript( files, definitions, tsFile )
+		)
 	)
-	.then( ( [ interfaces, _ ] ) =>
+	.then( ( ) =>
 		tsCompile( tsFile )
-		.then( ( ) => appendFileAsync( dtsFile, "\n" + interfaces ) )
 		.then( ( ) => Promise.all( [
 			prependHeader( jsFile ),
 			prependHeader( tsFile ),
